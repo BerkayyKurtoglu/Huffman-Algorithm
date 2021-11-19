@@ -45,7 +45,7 @@ public class HuffmanAlgorithm {
 
     public static void main(String[] args) throws IOException {
 
-        File file = new File("C:\\Users\\Berkay\\Desktop\\test.txt");
+        File file = new File(Util.FOLDER_PATH);
         BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
 
         //Read The File and Create A HashMap with Frequency
