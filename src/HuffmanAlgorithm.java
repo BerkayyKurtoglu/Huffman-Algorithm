@@ -8,7 +8,7 @@ public class HuffmanAlgorithm {
 
     static HashMap<Character,String> encodedTable = new HashMap<>();
     static HuffmanNode root = new HuffmanNode();
-
+    static String encodedString = "";
 
     public static void createEncodedTable(@NotNull HuffmanNode root, String s, BufferedWriter writer) throws IOException {
         if (root.left == null && root.right == null && Character.isLetter(root.c)) {
@@ -28,49 +28,63 @@ public class HuffmanAlgorithm {
         for (char c : st) {
             encodedTable.forEach(((character, s) -> {
                 if (c == character) {
-                    try {
-                        writer.write(s);
-                        writer.flush();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    encodedString = encodedString+s+" ";
                 }
             }));
         }
+        writer.write(encodedString);
+        writer.flush();
     }
 
-    public static void decodeCompressedFile(){
-
+    public static void decodeCompressedFile(BufferedWriter writer) throws IOException {
+        char[] array = encodedString.toCharArray();
+        StringBuilder rangeString = new StringBuilder();
+        StringBuilder completedSentence = new StringBuilder();
+        for (int i = 0; i < encodedString.length(); i++) {
+            while (array[i] != ' '){
+                rangeString.append(array[i]);
+                i++;
+            }
+            StringBuilder finalRangeString = rangeString;
+            encodedTable.forEach(((character, s) -> {
+                if (finalRangeString.toString().equals(s)){
+                    completedSentence.append(character);
+                }
+            }));
+            System.out.println(rangeString);
+            rangeString = new StringBuilder();
+        }
+        writer.write("\nDecoded sentence -> "+ completedSentence.toString());
+        writer.flush();
+        System.out.println(completedSentence);
     }
 
     public static void main(String[] args) throws IOException {
 
-        File file = new File(Util.FOLDER_PATH);
+        File file = new File(Util.FOLDER_PATH); //Read File
         BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+        File resultFile = new File("Result.txt"); //Create to write result
+        BufferedWriter fileWriter = new BufferedWriter(new FileWriter(resultFile));
 
         //Read The File and Create A HashMap with Frequency
-        String st = "";
+        String st;
         char [] initialStringArray = {};
         HashMap<Character,Integer> keyAndFrequencyMap = new HashMap<>();
         while ((st = bufferedReader.readLine()) != null){
             initialStringArray =st.toCharArray();
-            System.out.println(st);
+            fileWriter.write("String that is going to be encoded : "+st+"\n");
+            fileWriter.flush();
             for (char value : initialStringArray) {
                 int number = 0;
-                char c = value;
                 for (int j = 0; j < st.length(); j++) {
-                    if (c == initialStringArray[j]) number += 1;
+                    if (value == initialStringArray[j]) number += 1;
                 }
-                keyAndFrequencyMap.put(c, number);
+                keyAndFrequencyMap.put(value, number);
             }
         }
 
-        File resultFile = new File("Result.txt");
-        BufferedWriter fileWriter = new BufferedWriter(new FileWriter(resultFile));
-
+        //Queue is ready
         PriorityQueue<HuffmanNode> queue = new PriorityQueue<>(keyAndFrequencyMap.size(),new CustomComparator());
-        //Queue is ready now
-
         keyAndFrequencyMap.forEach((c,f)->{
             HuffmanNode huffmanNode = new HuffmanNode();
             huffmanNode.c = c;
@@ -81,7 +95,6 @@ public class HuffmanAlgorithm {
         });
 
         while (queue.size() > 1) {
-
             HuffmanNode left = queue.poll();
             HuffmanNode right = queue.poll();
 
@@ -98,7 +111,7 @@ public class HuffmanAlgorithm {
         System.out.println("Encoded Table : ");
         createEncodedTable(root,"",fileWriter);
         createEncodedString(initialStringArray,fileWriter);
-
+        decodeCompressedFile(fileWriter);
     }
 
 
