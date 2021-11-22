@@ -22,7 +22,7 @@ public class HuffmanAlgorithm {
         createEncodedTable(root.right, s + "1",writer);
     }
 
-    public static void createEncodedString (char[] st,BufferedWriter writer) throws IOException {
+    public static void createEncodedString (char @NotNull [] st, @NotNull BufferedWriter writer) throws IOException {
         writer.write("Encoded String : ");
         writer.flush();
         for (char c : st) {
@@ -113,6 +113,5 @@ public class HuffmanAlgorithm {
         createEncodedString(initialStringArray,fileWriter);
         decodeCompressedFile(fileWriter);
     }
-
 
 }
